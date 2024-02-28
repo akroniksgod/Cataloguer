@@ -36,8 +36,10 @@ public class Program
                         .AllowCredentials();
                 });
             });
-            
-            var configSettings = builder.Environment.IsDevelopment() ? "appsettings.Development.json" : "appsettings.json";
+
+            var env = builder.Environment;
+            var envConfigPostfix = !env.IsProduction() ? env.EnvironmentName : "";
+            var configSettings = $"appsettings.{envConfigPostfix}.json";
             builder.Configuration.AddJsonFile(configSettings);
 
             _baseRoute = builder.Configuration["BaseRoute"];

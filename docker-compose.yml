@@ -20,8 +20,9 @@ services:
       - ./frontend-app:/app/frontend-app
     depends_on:
       - database
+      - nginx
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - DataBaseConnectionString=User ID=postgres;Password=postgres;Host=database;Port=5433;Database=CataloguerDataBasePostgres;Include Error Detail=true;
       - BackendConnectionString=http://+:9595
       - BaseRoute=/api/v1/cataloguer
@@ -47,6 +48,8 @@ services:
 volumes:
   cataloguer-db:
   frontend-app:
+  data:
+  letsencrypt:  
 networks:
   deploy-network:
     driver: bridge
