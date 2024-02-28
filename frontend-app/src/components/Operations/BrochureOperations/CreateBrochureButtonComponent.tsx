@@ -10,63 +10,15 @@ import GoodsStore from "../../../stores/GoodsStore";
 import dayjs from "dayjs";
 import locale from 'antd/es/date-picker/locale/ru_RU';
 import 'dayjs/locale/ru';
-
-/**
- * Перечисления типов в метаданных для компонента CreateBrochureButtonComponent.
- */
-export enum MetadataTypes {
-    STR_FIELD,
-    NMBR_FIELD,
-    TBL_FIELD,
-    DATE_FIELD,
-    LIST_FIELD,
-}
-
-/**
- * Свойства метаданных для компонента CreateBrochureButtonComponent.
- * @param id Идентификатор поля.
- * @param name Наименование поля.
- * @param type Тип поля.
- * @param isRequired Обязательное поле или нет.
- * @param min Минимальное значение.
- * @param max Максимальное значение.
- * @param defaultValue Значение по умолчанию.
- * @param helpText Текст подсказки.
- */
-export interface MetadataProps {
-    id: string,
-    name: string,
-    type: MetadataTypes,
-    isRequired: boolean,
-    min?: number,
-    max?: number,
-    defaultValue?: string,
-    helpText?: string,
-}
-
-/**
- * Режимы кнопок компонента.
- * @param CREATE Создание каталога.
- * @param EDIT Редактирование каталога.
- * @param CREATE_GOODS Создание товара.
- */
-export enum ButtonModes {
-    CREATE,
-    EDIT,
-    CREATE_GOODS
-}
-
-/**
- * Словарь с режимами.
- * @param CREATE Создание каталога.
- * @param EDIT Редактирование каталога.
- * @param CREATE_GOODS Создание товара.
- */
-const modes = new Map([
-    [ButtonModes.CREATE, "Создать"],
-    [ButtonModes.EDIT, "Изменить"],
-    [ButtonModes.CREATE_GOODS, "Добавить"],
-]);
+import {
+    ButtonModes,
+    CREATE_FORM_METADATA,
+    CREATE_GOODS_FORM_METADATA,
+    EDIT_FORM_METADATA,
+    MetadataTypes,
+    BUTTON_MODES
+} from "../../../constants/CreateBrochureButtonConstants";
+import {MetadataProps} from "../../../types/OperationsTypes";
 
 /**
  * Свойства компонента CreateBrochureButtonComponent.
@@ -74,8 +26,8 @@ const modes = new Map([
  * @param goodsStore Хранилище каталогов.
  */
 interface CreateBrochureButtonComponentProps extends BaseStoreInjector {
-    mode: ButtonModes,
-    goodsStore?: GoodsStore,
+    mode: ButtonModes;
+    goodsStore?: GoodsStore;
 }
 
 /**
@@ -83,33 +35,9 @@ interface CreateBrochureButtonComponentProps extends BaseStoreInjector {
  */
 const CreateBrochureButtonComponent: React.FC<CreateBrochureButtonComponentProps> = inject("brochureStore", "goodsStore")(observer((props) => {
     /**
-     * Метаданные модалки редактирования каталога.
-     */
-    const editFormMetadata: Readonly<MetadataProps[]> = [
-        { id: "brochure_name", name: "Название", type: MetadataTypes.STR_FIELD, isRequired: true, min: 1, max: 30, helpText: "Значение по длине не более 30 символлов"},
-        { id: "brochure_date", name: "Период выпуска каталога", type: MetadataTypes.DATE_FIELD, isRequired: true, defaultValue: new Date().toISOString()},
-        { id: "brochure_edition", name: "Тираж", type: MetadataTypes.NMBR_FIELD, isRequired: true, min: 1, max: 10_000, defaultValue: "500", helpText: "Значение не более 10 000"},
-    ];
-
-    /**
-     * Метаданные для формы создания товаров.
-     */
-    const createGoodsFormMetaData: Readonly<MetadataProps[]> = [
-        { id: "brochure_positions", name: "Перечень товаров", type: MetadataTypes.TBL_FIELD, isRequired: false},
-    ];
-
-    /**
-     * Метаданные создания каталога.
-     */
-    const createFormMetadata: Readonly<MetadataProps[]> = [
-        ...editFormMetadata,
-        ...createGoodsFormMetaData,
-    ];
-
-    /**
      * Текущий режим.
      */
-    const currentMode = modes.get(props.mode) ?? "";
+    const currentMode = BUTTON_MODES.get(props.mode) ?? "";
 
     /**
      * Указатель на форму.
@@ -135,9 +63,9 @@ const CreateBrochureButtonComponent: React.FC<CreateBrochureButtonComponentProps
      */
     const getFormMetaData = (): readonly MetadataProps[] => {
         switch (props.mode) {
-            case ButtonModes.CREATE: return createFormMetadata;
-            case ButtonModes.EDIT: return editFormMetadata;
-            case ButtonModes.CREATE_GOODS: return createGoodsFormMetaData;
+            case ButtonModes.CREATE: return CREATE_FORM_METADATA;
+            case ButtonModes.EDIT: return EDIT_FORM_METADATA;
+            case ButtonModes.CREATE_GOODS: return CREATE_GOODS_FORM_METADATA;
             default: return [];
         }
     };

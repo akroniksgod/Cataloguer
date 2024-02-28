@@ -1,6 +1,5 @@
 import BaseButton from "../BaseButtonComponent";
 import React from "react";
-import {MetadataProps, MetadataTypes} from "../BrochureOperations/CreateBrochureButtonComponent";
 import {Form, Input, Select} from "antd";
 import {inject, observer} from "mobx-react";
 import {BaseStoreInjector} from "../../../types/BrochureTypes";
@@ -8,6 +7,18 @@ import {DistributionStore} from "../../../stores/DistributionStore";
 import {cerr, getValidator} from "../../../Utils";
 import {EditDistributionDbProps} from "../../../types/DistributionTypes";
 import {openNotification} from "../../NotificationComponent";
+import {MetadataTypes} from "../../../constants/CreateBrochureButtonConstants";
+import {MetadataProps} from "../../../types/OperationsTypes";
+
+/**
+ * Коллекция метаданных.
+ */
+const metadata: Readonly<MetadataProps[]> = [
+    { id: "distribution_genders", name: "Пол", type: MetadataTypes.LIST_FIELD, isRequired: true},
+    { id: "distribution_towns", name: "Населённый пункт", type: MetadataTypes.LIST_FIELD, isRequired: true},
+    { id: "distribution_ageGroups", name: "Возрастная группа", type: MetadataTypes.LIST_FIELD, isRequired: true},
+    { id: "distribution_brochureCount", name: "Количество каталогов", type: MetadataTypes.NMBR_FIELD, isRequired: true, min: 1, defaultValue: '1'},
+];
 
 /**
  * Свойства компонента содания рассылки.
@@ -23,16 +34,6 @@ interface CreateDistributionButtonComponentProps extends BaseStoreInjector {
  * Компонент кнопки создания рассылки.
  */
 const CreateDistributionButtonComponent: React.FC<CreateDistributionButtonComponentProps> = inject("brochureStore", "distributionStore")(observer((props) => {
-    /**
-     * Коллекция метаданных.
-     */
-    const metadata: Readonly<MetadataProps[]> = [
-        { id: "distribution_genders", name: "Пол", type: MetadataTypes.LIST_FIELD, isRequired: true},
-        { id: "distribution_towns", name: "Населённый пункт", type: MetadataTypes.LIST_FIELD, isRequired: true},
-        { id: "distribution_ageGroups", name: "Возрастная группа", type: MetadataTypes.LIST_FIELD, isRequired: true},
-        { id: "distribution_brochureCount", name: "Количество каталогов", type: MetadataTypes.NMBR_FIELD, isRequired: true, min: 1, defaultValue: '1'},
-    ];
-
     /**
      * Указатель на форму.
      */

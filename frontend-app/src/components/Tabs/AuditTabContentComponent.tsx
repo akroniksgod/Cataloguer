@@ -6,6 +6,11 @@ import {inject, observer} from "mobx-react";
 import AuditStore from "../../stores/AuditStore";
 
 /**
+ * Максимальное число нажитий на кнопку.
+ */
+const MAX_CLICK_COUNT = 2;
+
+/**
  * Свойства компонента вкладки с аудитом.
  */
 interface AuditTabContentComponentProps {
@@ -26,13 +31,8 @@ const AuditTabContentComponent: React.FC<AuditTabContentComponentProps> = inject
      */
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-    /**
-     * Максимальное число нажитий на кнопку.
-     */
-    const maxClickCount = 2;
-
     useEffect(() => {
-        if (clickCount >= maxClickCount) {
+        if (clickCount >= MAX_CLICK_COUNT) {
             setIsButtonDisabled(true);
         }
     }, [clickCount]);
@@ -42,7 +42,7 @@ const AuditTabContentComponent: React.FC<AuditTabContentComponentProps> = inject
      */
     const onClick = () => {
         setClickCount(prev => prev + 1);
-        if (clickCount < maxClickCount) {
+        if (clickCount < MAX_CLICK_COUNT) {
             props.auditStore?.updateCurrentLogs();
             return;
         }

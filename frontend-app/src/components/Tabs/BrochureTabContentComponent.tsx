@@ -1,13 +1,12 @@
 import {Content, Header} from "antd/es/layout/layout";
 import {Layout, Space} from "antd";
-import CreateBrochureButtonComponent, {
-    ButtonModes
-} from "../Operations/BrochureOperations/CreateBrochureButtonComponent";
+import CreateBrochureButtonComponent from "../Operations/BrochureOperations/CreateBrochureButtonComponent";
 import DeleteBrochureButtonComponent from "../Operations/BrochureOperations/DeleteBrochureButtonComponent";
 import CheckEfficiencyButtonComponent from "../Operations/BrochureOperations/CheckEfficiencyButtonComponent";
 import ReleaseBrochureButtonComponent from "../Operations/BrochureOperations/ReleaseBrochureButtonComponent";
 import BrochureComponent from "../BrochureComponent";
 import React from "react";
+import {ButtonModes} from "../../constants/CreateBrochureButtonConstants";
 
 /**
  * Содержимое вкладки с каталогами.

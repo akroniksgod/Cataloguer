@@ -6,12 +6,11 @@ import "../../../styles/Tabs/GoodsTab.css";
 import {Content, Header} from "antd/es/layout/layout";
 import GoodsStore from "../../../stores/GoodsStore";
 import NoDataComponent from "../../NoDataComponent";
-import CreateBrochureButtonComponent, {
-    ButtonModes
-} from "../../Operations/BrochureOperations/CreateBrochureButtonComponent";
+import CreateBrochureButtonComponent from "../../Operations/BrochureOperations/CreateBrochureButtonComponent";
 import DeleteGoodsButtonComponent from "../../Operations/GoodsOperations/DeleteGoodsButtonComponent";
 import {SHOULD_USE_ONLY_DB_DATA} from "../../../constants/EnvironmentVariables";
 import Search from "antd/es/input/Search";
+import {ButtonModes} from "../../../constants/CreateBrochureButtonConstants";
 
 /**
  * Свойства компонента GoodsDescriptionComponent.

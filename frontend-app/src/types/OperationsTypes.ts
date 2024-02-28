@@ -1,4 +1,5 @@
 import React from "react";
+import {MetadataTypes} from "../constants/CreateBrochureButtonConstants";
 
 /**
  * Свойства модального окна.
@@ -48,6 +49,28 @@ interface ModalProps {
 interface BaseButtonComponentProps {
     buttonProps: ButtonProps,
     modalProps: ModalProps,
+}
+
+/**
+ * Свойства метаданных для компонента CreateBrochureButtonComponent.
+ * @param id Идентификатор поля.
+ * @param name Наименование поля.
+ * @param type Тип поля.
+ * @param isRequired Обязательное поле или нет.
+ * @param min Минимальное значение.
+ * @param max Максимальное значение.
+ * @param defaultValue Значение по умолчанию.
+ * @param helpText Текст подсказки.
+ */
+export interface MetadataProps {
+    id: string,
+    name: string,
+    type: MetadataTypes,
+    isRequired: boolean,
+    min?: number,
+    max?: number,
+    defaultValue?: string,
+    helpText?: string,
 }
 
 export type {

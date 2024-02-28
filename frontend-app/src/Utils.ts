@@ -1,8 +1,8 @@
-import {MetadataProps, MetadataTypes} from "./components/Operations/BrochureOperations/CreateBrochureButtonComponent";
 import {customProp} from "./types/BrochureTypes";
-
 import {IS_DEBUG} from "./constants/EnvironmentVariables";
 import dayjs from "dayjs";
+import {MetadataTypes} from "./constants/CreateBrochureButtonConstants";
+import {MetadataProps} from "./types/OperationsTypes";
 
 /**
  * Возвращает случайное число в промежутке от min до max.
