@@ -1,71 +1,49 @@
 import '../styles/App.css';
-import React, {useState} from "react";
-import {ConfigProvider, Layout, Tabs, Typography} from "antd";
-import {Header} from 'antd/es/layout/layout';
-import BrochureTabContent from './Tabs/BrochureTabContentComponent';
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import MainPageComponent from "./MainPageComponent";
+import {Result} from "antd";
+import {TabLink} from "../constants/MainPageComponentConstants";
 import AuditTabContentComponent from "./Tabs/AuditTabContentComponent";
-import {TabProps} from "../types/AppTypes";
+import BrochureTabContent from './Tabs/BrochureTabContentComponent';
 
 /**
- * Перечисление табов.
+ * Список маршрутов приложения.
  */
-enum TabKey {
-    BROCHURES = "main_tab_brochures",
-    AUDIT = "main_tab_loggs",
-}
-
-/**
- * Вкладки меню первого уровня.
- */
-const TABS: Readonly<TabProps[]> = [
-    {label: "Каталоги", key: TabKey.BROCHURES},
-    {label: "Аудит", key: TabKey.AUDIT}
-];
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: (
+            <MainPageComponent/>
+        ),
+        children: [
+            {
+                path: `${TabLink.BROCHURES}/:brochureId?/:subSection?`,
+                element: <BrochureTabContent/>,
+            },
+            {
+                path: `${TabLink.AUDIT}`,
+                element: <AuditTabContentComponent/>,
+            },
+        ]
+    },
+    {
+        path: "*",
+        element: (
+            <Result
+                status={"404"}
+                title={"404"}
+                subTitle={"Данная страница не существует."}
+            />
+        ),
+    },
+]);
 
 /**
  * Стартовый компонент.
  */
 const App = () => {
-    /**
-     * Текущая вкладка.
-     */
-    const [currentTab, setCurrentTab] = useState<string>(TabKey.BROCHURES);
-
-    /**
-     * Содержимая вкладки.
-     */
-    const getTabContent = () => {
-        switch (currentTab) {
-            case TabKey.BROCHURES: return (<BrochureTabContent/>);
-            case TabKey.AUDIT: return (<AuditTabContentComponent/>);
-            default: return null;
-        }
-    };
-
     return (
-        <Layout className={"white-background-style"}>
-            <Header className={"main-window-header"}>
-                <Typography.Title className={"header-title"}>
-                    Формирование эффективного каталога товаров
-                </Typography.Title>
-                <ConfigProvider theme={{
-                    token: {
-                        colorPrimary: 'black',
-                        colorPrimaryHover: 'white',
-                    }}}
-                >
-                    <Tabs
-                        className={"main-tabs-style"}
-                        activeKey={currentTab}
-                        onChange={setCurrentTab}
-                        items={TABS.map(tab => tab)}
-                    />
-                </ConfigProvider>
-            </Header>
-            <Layout className={"main-window-layout"}>
-                {getTabContent()}
-            </Layout>
-        </Layout>
+        <RouterProvider router={router} />
     );
 };
 
