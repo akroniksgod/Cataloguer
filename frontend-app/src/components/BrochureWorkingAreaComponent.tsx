@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Layout, Tabs, Typography} from "antd";
 import {Content, Header} from "antd/es/layout/layout";
 import "../styles/BrochureWorkingArea.css"
@@ -8,6 +8,8 @@ import GoodsDescriptionComponent from "./Tabs/BrochureNestedTabs/GoodsDescriptio
 import {inject, observer} from "mobx-react";
 import {BaseStoreInjector, BrochureProps} from "../types/BrochureTypes";
 import RunResultComponent from "./Tabs/BrochureNestedTabs/RunResultComponent";
+import {useLocation} from "react-router-dom";
+import {getFirstLevelLink} from "../Utils";
 
 /**
  * Перечисление для вкладок.
@@ -15,10 +17,19 @@ import RunResultComponent from "./Tabs/BrochureNestedTabs/RunResultComponent";
  * @param DISTRIBUTION_TAB Вкладка рассылки.
  */
 enum TabKeys {
+    NONE = "brochure_empty_tab",
     BROCHURE_TAB = "brochure_description_tab",
     DISTRIBUTION_TAB = "distribution_description_tab",
     GOODS_TAB = "goods_description_tab",
     RUN_TAB = "run_description_tab",
+}
+
+enum TabLinks {
+    NONE = "/",
+    BROCHURE = "overview",
+    DISTRIBUTION = "distribution",
+    GOODS = "goods",
+    RUN = "run",
 }
 
 /**
@@ -42,9 +53,9 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
     const [brochure, setBrochure] = useState<BrochureProps | null>(null);
 
     /**
-     * Ключ текущей (выбранной) вкладки.
+     * Данные адресной строки.
      */
-    const [currentTabKey, setCurrentTabKey] = useState<string>(TabKeys.BROCHURE_TAB);
+    const location = useLocation();
 
     /**
      * Множество вкладок.
@@ -53,21 +64,66 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
         {
             key: TabKeys.BROCHURE_TAB,
             label: "Каталог",
+            link: TabLinks.BROCHURE,
         },
         {
             key: TabKeys.GOODS_TAB,
             label: 'Состав',
+            link: TabLinks.GOODS,
         },
         {
             key: TabKeys.DISTRIBUTION_TAB,
             label: 'Рассылка',
+            link: TabLinks.DISTRIBUTION,
         },
         {
             key: TabKeys.RUN_TAB,
             label: 'Расчёт',
             disabled: brochure?.potentialIncome === 0,
+            link: TabLinks.RUN,
         },
     ];
+
+    /**
+     * Возвращает ключ исходного раздела.
+     */
+    const getInitialTabKey = useCallback(() => {
+        const link = location.pathname;
+        return tabs.find(tab => tab.link === link)?.key ?? TabKeys.NONE;
+    }, []);
+
+    /**
+     * Ключ текущей (выбранной) вкладки.
+     */
+    const [currentTabKey, setCurrentTabKey] = useState<string>(getInitialTabKey());
+
+    /**
+     * Изменяет данные на странице.
+     * Добавляет текущее состояние в history.
+     * @param tabKey Ключ раздела.
+     * @param title Заголовок.
+     * @param link Ссылка.
+     */
+    const updatePushState = (tabKey: string, brochureId: number) => {
+        const link = getFirstLevelLink(location.pathname);
+        const innerObject = {subRoute: tabKey, brochureId: brochureId};
+        const currentSubRoute = tabs.find(tab => tab.key === tabKey)?.link ?? TabLinks.NONE;
+        window.history.pushState({...window.history.state, ...innerObject}, "", `${link}/${brochureId}/${currentSubRoute}`);
+    };
+
+    /**
+     * Изменяет данные на странице.
+     * Добавляет текущее состояние в history.
+     * @param tabKey Ключ раздела.
+     * @param title Заголовок.
+     * @param link Ссылка.
+     */
+    const updateReplaceState = (tabKey: string, brochureId: number) => {
+        const link = getFirstLevelLink(location.pathname);
+        const currentSubRoute = tabs.find(tab => tab.key === tabKey)?.link ?? TabLinks.NONE;
+        const innerObject = {subRoute: tabKey};
+        window.history.replaceState({...window.history.state, ...innerObject}, "", `${link}/${brochureId}/${currentSubRoute}`);
+    };
 
     /**
      * Возвращает ключ вкладки.
@@ -83,12 +139,13 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
      * При смене каталога устанавливает первую вкладку.
      */
     useEffect(() => {
+        const currentBrochure = props.brochureStore?.currentBrochure ?? null;
+
         setBrochure(prevBrochure => {
             let key: string = TabKeys.BROCHURE_TAB;
 
-            const prevId = prevBrochure !== null ? prevBrochure.id : -1;
-            const currentBrochure = props.brochureStore?.currentBrochure ?? null;
-            if (currentBrochure) {
+            const prevId = prevBrochure?.id ?? -1;
+            if (!!currentBrochure) {
                 const currentId = currentBrochure.id;
                 const areSameBrochures = currentId === prevId;
                 const isPrevBrochureNull = prevId === -1;
@@ -96,8 +153,10 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
                         (areSameBrochures && !isPrevBrochureNull)) {
                     key = getTabKey();
                 }
+                setCurrentTabKey(key);
+                updateReplaceState(key, currentBrochure?.id ?? -1);
             }
-            setCurrentTabKey(key);
+
             return currentBrochure;
         });
     }, [props.brochureStore?.currentBrochure?.id]);
@@ -114,6 +173,7 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
     const onTabChange = (tabKey: string): void => {
         setCurrentTabKey(tabKey);
         sessionStorage.setItem(SS_SAVED_TAB, tabKey);
+        updatePushState(tabKey, brochure?.id ?? -1);
     };
 
     /**
@@ -138,6 +198,38 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
         const {name, edition, statusName, potentialIncome} = brochure;
         return `${name} \\ ${edition} \\ ${potentialIncome} \\ ${statusName}`;
     };
+
+    /**
+     * Обрабатывает событие нажатия на стрелочку назад в браузере.
+     * @param event Событие.
+     */
+    const onPopStateEvent = (event: PopStateEvent) => {
+        if (!event) return;
+        const state = event.state;
+        const {subRoute, brochureId} = state;
+
+        if ((brochureId || brochureId === 0) && subRoute) {
+            setCurrentTabKey(subRoute);
+            props.brochureStore?.onBrochureClick(brochureId);
+            return;
+        }
+
+        if (!brochureId && !subRoute) {
+            setCurrentTabKey(TabKeys.NONE);
+            props.brochureStore?.reset();
+        }
+    };
+
+    /**
+     * Подписывает события компонента.
+     */
+    useEffect(() => {
+        window.addEventListener("popstate", onPopStateEvent, false);
+
+        return () => {
+            window.removeEventListener("popstate", onPopStateEvent);
+        };
+    }, []);
 
     return (
         <Layout className={"white-background-style"}>

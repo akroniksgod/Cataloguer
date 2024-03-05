@@ -17,7 +17,7 @@ const router = createBrowserRouter([
         ),
         children: [
             {
-                path: `${TabLink.BROCHURES}/:brochureId?/:subSection?`,
+                path: `${TabLink.BROCHURES}/:brochureId?/:subRoute?`,
                 element: <BrochureTabContent/>,
             },
             {

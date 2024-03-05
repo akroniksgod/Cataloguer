@@ -5,6 +5,8 @@ import "../styles/BrochureMenu.css";
 import {inject, observer} from "mobx-react";
 import {BaseStoreInjector} from "../types/BrochureTypes";
 import StatusIconsComponent from "./IconsComponent";
+import {getFirstLevelLink} from "../Utils";
+import {useLocation} from "react-router-dom";
 
 /**
  * Свойства компонента BrochureMenuComponent.
@@ -21,6 +23,11 @@ const BrochureMenuComponent: React.FC<BrochureMenuComponentProps> = inject("broc
      * Хук для хранения коллекции элементов меню.
      */
     const [brochureItems, setBrochureItems] = useState<MenuProps['items']>([]);
+
+    /**
+     * Данные адресной строки.
+     */
+    const location = useLocation();
 
     /**
      * Загружает каталог из настроек браузера.
@@ -78,12 +85,24 @@ const BrochureMenuComponent: React.FC<BrochureMenuComponentProps> = inject("broc
     }, [props.brochureStore?.brochures]);
 
     /**
+     * Изменяет данные на странице.
+     * Добавляет текущее состояние в history.
+     * @param brochureId Идентификатор каталога.
+     */
+    const updatePushState = (brochureId: number) => {
+        const link = getFirstLevelLink(location.pathname);
+        const innerObject = {brochureId: brochureId};
+        window.history.pushState({...window.history.state, ...innerObject}, "", `${link}/${brochureId}`);
+    };
+
+    /**
      * Изменяет выбранный каталог.
      * @param event Событие, содержащее данные по каталогу.
      */
     const onSelectBrochure = (event: {key: string}): void => {
         const brochureKey: string = event.key ?? "";
         const id = brochureKey.slice(brochureKey.indexOf('_') + 1);
+        updatePushState(id !== "undefined" ? parseInt(id) : -1);
         props.brochureStore?.onBrochureClick(id !== "undefined" ? parseInt(id) : -1);
     };
 

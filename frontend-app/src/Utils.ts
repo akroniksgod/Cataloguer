@@ -3,6 +3,7 @@ import {IS_DEBUG} from "./constants/EnvironmentVariables";
 import dayjs from "dayjs";
 import {MetadataTypes} from "./constants/CreateBrochureButtonConstants";
 import {MetadataProps} from "./types/OperationsTypes";
+import {ALL_LINKS, TabKey, TabLink, TABS} from "./constants/MainPageComponentConstants";
 
 /**
  * Возвращает случайное число в промежутке от min до max.
@@ -95,4 +96,12 @@ export const cerr = (message: string) => {
  */
 export const cout = (message: string) => {
     IS_DEBUG && console.log(message);
+};
+
+/**
+ * Возвращает гарантированно рабочую ссылку.
+ * @param pathname Путь в адресной строке.
+ */
+export const getFirstLevelLink = (pathname: string): string => {
+    return ALL_LINKS.find(link => pathname.includes(link)) ?? TabLink.NONE;
 };
