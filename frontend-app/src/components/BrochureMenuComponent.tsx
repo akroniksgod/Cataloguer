@@ -6,7 +6,7 @@ import {inject, observer} from "mobx-react";
 import {BaseStoreInjector} from "../types/BrochureTypes";
 import StatusIconsComponent from "./IconsComponent";
 import {getFirstLevelLink} from "../Utils";
-import {useLocation} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 
 /**
  * Свойства компонента BrochureMenuComponent.
@@ -30,13 +30,25 @@ const BrochureMenuComponent: React.FC<BrochureMenuComponentProps> = inject("broc
     const location = useLocation();
 
     /**
+     * Параметр из адресной строки.
+     * Идентификатор сценария.
+     */
+    const {brochureId} = useParams();
+
+    /**
      * Загружает каталог из настроек браузера.
      */
-    const loadSelectedBrochure = (): void => {
+    const setSelectedBrochureOnLoad = (loadedBrochureId?: string): void => {
         const preBrochure = props.brochureStore?.getSavedBrochure() ?? null;
-        const id = preBrochure !== null ? preBrochure.id : -1;
-        if (id === -1) return;
+        let id = -1;
 
+        if (loadedBrochureId) {
+            id = parseInt(loadedBrochureId);
+        } else if (preBrochure !== null) {
+            id = preBrochure.id;
+        }
+
+        if (id === -1) return;
         onSelectBrochure({key: `brochure_${id}`});
     };
 
@@ -46,7 +58,7 @@ const BrochureMenuComponent: React.FC<BrochureMenuComponentProps> = inject("broc
      */
     useEffect(() => {
         props.brochureStore?.loadBrochures();
-        loadSelectedBrochure();
+        setSelectedBrochureOnLoad(brochureId);
     }, []);
 
     /**

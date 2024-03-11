@@ -17,8 +17,20 @@ const router = createBrowserRouter([
         ),
         children: [
             {
-                path: `${TabLink.BROCHURES}/:brochureId?/:subRoute?`,
+                path: `${TabLink.BROCHURES}`,
                 element: <BrochureTabContent/>,
+                children: [
+                    {
+                        path: `:brochureId`,
+                        element: <BrochureTabContent/>,
+                        children: [
+                            {
+                                path: `:subRoute`,
+                                element: <BrochureTabContent/>,
+                            },
+                        ]
+                    },
+                ]
             },
             {
                 path: `${TabLink.AUDIT}`,
