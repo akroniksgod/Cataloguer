@@ -33,7 +33,7 @@ const BrochureMenuComponent: React.FC<BrochureMenuComponentProps> = inject("broc
      * Параметр из адресной строки.
      * Идентификатор сценария.
      */
-    const {brochureId} = useParams();
+    const {brochureId, subRoute} = useParams();
 
     /**
      * Загружает каталог из настроек браузера.
@@ -103,8 +103,10 @@ const BrochureMenuComponent: React.FC<BrochureMenuComponentProps> = inject("broc
      */
     const updatePushState = (brochureId: number) => {
         const link = getFirstLevelLink(location.pathname);
-        const innerObject = {brochureId: brochureId};
-        window.history.pushState({...window.history.state, ...innerObject}, "", `${link}/${brochureId}`);
+        const innerObject = {brochureId: brochureId, subRoute: subRoute};
+        const baseUrl = `${link}/${brochureId}`;
+        const url = !subRoute ? baseUrl : `${baseUrl}/${subRoute}`;
+        window.history.pushState({...window.history.state, ...innerObject}, "", url);
     };
 
     /**
@@ -115,7 +117,7 @@ const BrochureMenuComponent: React.FC<BrochureMenuComponentProps> = inject("broc
         const brochureKey: string = event.key ?? "";
         const id = brochureKey.slice(brochureKey.indexOf('_') + 1);
         updatePushState(id !== "undefined" ? parseInt(id) : -1);
-        props.brochureStore?.onBrochureClick(id !== "undefined" ? parseInt(id) : -1);
+        props.brochureStore?.onBrochureClick(id !== "undefined" ? parseInt(id) : -1, subRoute);
     };
 
     /**

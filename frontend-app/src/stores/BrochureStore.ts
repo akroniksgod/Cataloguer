@@ -7,7 +7,8 @@ import {
     GoodDBProps,
     GoodProps,
     GoodsExtendedProps,
-    GoodsProps, RunPointsDbProps,
+    GoodsProps,
+    RunPointsDbProps,
     StatusArrayProps
 } from "../types/BrochureTypes";
 import {cerr, cout, random} from "../Utils";
@@ -16,11 +17,17 @@ import GoodsService from "../services/GoodsService";
 import BrochureService from "../services/BrochureService";
 import dayjs from "dayjs";
 import {SHOULD_USE_ONLY_DB_DATA} from "../constants/EnvironmentVariables";
+import {TabKeys, TABS_MAP} from "../constants/BrochureWorkingAreaComponentConstants";
 
 /**
  * Путь к данным каталога в session storage.
  */
-const BROCHURE_SS_PATH: Readonly<string> = "ss_brochure";
+const BROCHURE_SS_PATH = "ss_brochure";
+
+/**
+ * Переменная для получения вкладки из хранилища
+ */
+export const SS_SAVED_TAB = "ss_saved_tab";
 
 /**
  * Перечислимый тип для статусов.
@@ -123,6 +130,7 @@ class BrochureStore {
         this.getRandomDistributions = this.getRandomDistributions.bind(this);
         this.getSavedBrochure = this.getSavedBrochure.bind(this);
         this.saveBrochureToSessionStorage = this.saveBrochureToSessionStorage.bind(this);
+        this.saveBrochureTabToSessionStorage = this.saveBrochureTabToSessionStorage.bind(this);
         this.getSavedBrochureMenu = this.getSavedBrochureMenu.bind(this);
         this.reset = this.reset.bind(this);
 
@@ -543,6 +551,20 @@ class BrochureStore {
 
     /**
      * Сохраняет каталог  в session storage.
+     * @param tab Ссылка вкладки.
+     */
+    @action private saveBrochureTabToSessionStorage(tab?: string): void {
+        let finalTab: string = TabKeys.BROCHURE_TAB;
+        if (tab) {
+            const mapElement = Array.from(TABS_MAP).find(([key, val]) => tab === val);
+            const key = mapElement?.at(0) ?? TabKeys.BROCHURE_TAB;
+            finalTab = key;
+        }
+        sessionStorage.setItem(SS_SAVED_TAB, JSON.stringify(finalTab));
+    }
+
+    /**
+     * Сохраняет каталог  в session storage.
      * @param brochure - каталог.
      */
     @action private saveBrochureToSessionStorage(brochure: BrochureProps | null): void {
@@ -551,9 +573,10 @@ class BrochureStore {
 
     /**
      * Срабатывает после выбора каталога в меню.
-     * @param brochureId - идентификатор каталога.
+     * @param brochureId Идентификатор каталога.
+     * @param subRoute Ссылка на вкладку.
      */
-    @action public async onBrochureClick(brochureId: number) {
+    @action public async onBrochureClick(brochureId: number, subRoute?: string) {
         if (isNaN(brochureId) || brochureId === -1) return;
 
         this.isBrochureSelected = true;
@@ -561,18 +584,17 @@ class BrochureStore {
 
         let foundBrochure = null;
 
-        // if (brochureId !== -1) {
-            if (SHOULD_USE_ONLY_DB_DATA === "false") {
-                foundBrochure = this.brochures.find(brochure => brochure.id === brochureId) ?? null;
-            } else {
-                await this.getBrochureById(brochureId).then((response: {data: any}) => {
-                    foundBrochure = response.data;
-                });
-            }
-        // }
+        if (SHOULD_USE_ONLY_DB_DATA === "false") {
+            foundBrochure = this.brochures.find(brochure => brochure.id === brochureId) ?? null;
+        } else {
+            await this.getBrochureById(brochureId).then((response: {data: any}) => {
+                foundBrochure = response.data;
+            });
+        }
 
         this.currentBrochure = foundBrochure;
         this.saveBrochureToSessionStorage(foundBrochure);
+        this.saveBrochureTabToSessionStorage(subRoute);
 
         setTimeout(() => {
             this.isBrochureLoading = false;
@@ -605,7 +627,7 @@ class BrochureStore {
 
         setTimeout(() => {
             this.isBrochureMenuLoading = false;
-        }, 300);
+        }, 200);
     }
 }
 

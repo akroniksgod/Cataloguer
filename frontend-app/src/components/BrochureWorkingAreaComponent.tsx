@@ -10,38 +10,14 @@ import {BaseStoreInjector, BrochureProps} from "../types/BrochureTypes";
 import RunResultComponent from "./Tabs/BrochureNestedTabs/RunResultComponent";
 import {useLocation} from "react-router-dom";
 import {getFirstLevelLink} from "../Utils";
-
-/**
- * Перечисление для вкладок.
- * @param BROCHURE_TAB Вкладка каталога.
- * @param DISTRIBUTION_TAB Вкладка рассылки.
- */
-enum TabKeys {
-    NONE = "brochure_empty_tab",
-    BROCHURE_TAB = "brochure_description_tab",
-    DISTRIBUTION_TAB = "distribution_description_tab",
-    GOODS_TAB = "goods_description_tab",
-    RUN_TAB = "run_description_tab",
-}
-
-enum TabLinks {
-    NONE = "/",
-    BROCHURE = "overview",
-    DISTRIBUTION = "distribution",
-    GOODS = "goods",
-    RUN = "run",
-}
+import {SS_SAVED_TAB} from "../stores/BrochureStore";
+import {TabKeys, TabLinks} from "../constants/BrochureWorkingAreaComponentConstants";
 
 /**
  * Свойства компонента BrochureWorkingAreaComponent.
  */
 interface BrochureWorkingAreaComponentProps extends BaseStoreInjector {
 }
-
-/**
- * Переменная для получения вкладки из хранилища
- */
-const SS_SAVED_TAB: Readonly<string> = "ss_saved_tab";
 
 /**
  * Компонент рабочей области каталога.
@@ -101,8 +77,7 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
      * Изменяет данные на странице.
      * Добавляет текущее состояние в history.
      * @param tabKey Ключ раздела.
-     * @param title Заголовок.
-     * @param link Ссылка.
+     * @param brochureId Идентификатор каталога.
      */
     const updatePushState = (tabKey: string, brochureId: number) => {
         const link = getFirstLevelLink(location.pathname);
@@ -115,8 +90,7 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
      * Изменяет данные на странице.
      * Добавляет текущее состояние в history.
      * @param tabKey Ключ раздела.
-     * @param title Заголовок.
-     * @param link Ссылка.
+     * @param brochureId Идентификатор каталога.
      */
     const updateReplaceState = (tabKey: string, brochureId: number) => {
         const link = getFirstLevelLink(location.pathname);
@@ -130,7 +104,7 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
      */
     const getTabKey = () => {
         const oldTab = sessionStorage.getItem(SS_SAVED_TAB);
-        return oldTab !== null ? oldTab : TabKeys.BROCHURE_TAB;
+        return oldTab !== null ? JSON.parse(oldTab) : TabKeys.BROCHURE_TAB;
     };
 
     /**
