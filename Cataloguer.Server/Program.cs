@@ -54,7 +54,13 @@ public class Program
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseCorsMiddleware();
-
+            
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapFallbackToFile("/index.html");
+            });
+            
             var dbConfig = new DataBaseConfiguration
             {
                 ConnectionsString = builder.Configuration["DataBaseConnectionString"]
@@ -70,7 +76,7 @@ public class Program
             RunBackgroundProcessRegistration(app, dbConfig);
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
+            
             app.Run();
         }
         catch (Exception ex)

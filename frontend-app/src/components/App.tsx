@@ -27,27 +27,17 @@ const router = createBrowserRouter([
                             {
                                 path: `:subRoute`,
                                 element: <BrochureTabContent/>,
-                            },
+                            }
                         ]
-                    },
+                    }
                 ]
             },
             {
                 path: `${TabLink.AUDIT}`,
                 element: <AuditTabContentComponent/>,
-            },
+            }
         ]
-    },
-    {
-        path: "*",
-        element: (
-            <Result
-                status={"404"}
-                title={"404"}
-                subTitle={"Данная страница не существует."}
-            />
-        ),
-    },
+    }
 ]);
 
 /**

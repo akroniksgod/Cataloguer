@@ -127,6 +127,10 @@ const BrochureWorkingAreaComponent: React.FC<BrochureWorkingAreaComponentProps> 
                         (areSameBrochures && !isPrevBrochureNull)) {
                     key = getTabKey();
                 }
+
+                const canOpenTab = tabs.find(tab => tab.key === key)?.disabled;
+                key = canOpenTab === undefined ? key : TabKeys.BROCHURE_TAB;
+
                 setCurrentTabKey(key);
                 updateReplaceState(key, currentBrochure?.id ?? -1);
             }
